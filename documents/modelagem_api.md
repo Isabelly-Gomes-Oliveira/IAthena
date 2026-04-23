@@ -66,103 +66,135 @@ Resumindo, o trajeto de informações é:
 504 Gateway Timeout
 - IA demorou demais pra responder
 
-## MODELO: MVC
+## MODELO: MVC EM JS
 
 ![Texto Alternativo](https://arquivo.devmedia.com.br/REVISTAS/easyjava/imagens/9/3/image001.jpg)
+
+### ESTRUTURA:
+
+📁 controllers
+   - analiseController.js
+
+📁 models
+   - AnaliseRequest.js
+   - AnaliseResponse.js
+
+📁 services
+   - fakeNewsService.js
+
+📄 app.js
 
 ### EXEMPLO:
 
 ### 🧱 MODEL (dados)
 
 ```
-// Classe que representa o que o usuário envia para a API
-public class AnaliseRequest
-{
-    // Texto que será analisado pela IA
-    public string Texto { get; set; }
+// Classe que representa o que o usuário envia
+class AnaliseRequest {
+    constructor(texto) {
+        // Texto que será analisado
+        this.texto = texto;
+    }
 }
 
+// Exporta a classe para uso em outros arquivos
+module.exports = AnaliseRequest;
+```
+
+```
 // Classe que representa a resposta da API
-public class AnaliseResponse
-{
-    // Resultado da análise (Fake, Verdadeiro, Duvidoso)
-    public string Resultado { get; set; }
+class AnaliseResponse {
+    constructor(resultado, confianca) {
+        // Resultado: Fake, Verdadeiro ou Duvidoso
+        this.resultado = resultado;
 
-    // Nível de confiança da IA (ex: 0.85 = 85%)
-    public double Confianca { get; set; }
+        // Nível de confiança (ex: 0.85)
+        this.confianca = confianca;
+    }
 }
+
+// Exporta a classe
+module.exports = AnaliseResponse;
 ```
 
 ### ⚙️ SERVICE (lógica da aplicação + IA)
 
 ```
-// Classe responsável pela lógica de negócio e integração com IA
-public class FakeNewsService
-{
-    // Método que analisa um texto e retorna o resultado
-    public AnaliseResponse AnalisarTexto(string texto)
-    {
-        // Verifica se o texto contém a palavra "milagre" (simulação de IA)
-        if (texto.ToLower().Contains("milagre"))
-        {
-            // Retorna um objeto com resultado "Duvidoso"
-            return new AnaliseResponse
-            {
-                // Define o resultado da análise
-                Resultado = "Duvidoso",
+// Importa o model de resposta
+const AnaliseResponse = require('../models/AnaliseResponse');
 
-                // Define o nível de confiança (55%)
-                Confianca = 0.55
-            };
+// Classe responsável pela lógica da aplicação
+class FakeNewsService {
+
+    // Método que analisa o texto
+    analisarTexto(texto) {
+
+        // Verifica se o texto contém "milagre" (simulação de IA)
+        if (texto.toLowerCase().includes("milagre")) {
+
+            // Retorna resultado "Duvidoso"
+            return new AnaliseResponse("Duvidoso", 0.55);
         }
 
-        // Caso não contenha "milagre", retorna como Fake
-        return new AnaliseResponse
-        {
-            // Define o resultado como Fake
-            Resultado = "Fake",
-
-            // Define o nível de confiança (80%)
-            Confianca = 0.80
-        };
+        // Caso contrário, retorna "Fake"
+        return new AnaliseResponse("Fake", 0.80);
     }
 }
+
+// Exporta uma instância do serviço
+module.exports = new FakeNewsService();
 ```
 
 ### 🎮 CONTROLLER (entrada da API)
 ```
-// Indica que essa classe é um Controller de API
-[ApiController]
+// Importa o service
+const fakeNewsService = require('../services/fakeNewsService');
 
-// Define a rota base: api/analise
-[Route("api/[controller]")]
-public class AnaliseController : ControllerBase
-{
-    // Variável privada que armazena o serviço de análise
-    private readonly FakeNewsService _service;
+// Função que será chamada quando fizer POST
+const analisar = (req, res) => {
 
-    // Construtor que recebe o serviço via injeção de dependência
-    public AnaliseController(FakeNewsService service)
-    {
-        // Atribui o serviço recebido à variável interna
-        _service = service;
+    // Pega o texto do corpo da requisição
+    const { texto } = req.body;
+
+    // Validação: verifica se veio texto
+    if (!texto) {
+        // Retorna erro 400
+        return res.status(400).json({ erro: "Texto é obrigatório" });
     }
 
-    // Define que esse método responde a requisições HTTP POST
-    [HttpPost]
-    public IActionResult Analisar([FromBody] AnaliseRequest request)
-    {
-        // Verifica se o texto enviado está vazio ou nulo
-        if (string.IsNullOrEmpty(request.Texto))
-            
-            // Retorna erro 400 (Bad Request) com mensagem
-            return BadRequest("Texto é obrigatório");
+    // Chama o service para analisar
+    const resultado = fakeNewsService.analisarTexto(texto);
 
-        // Chama o service para analisar o texto
-        var resultado = _service.AnalisarTexto(request.Texto);
+    // Retorna o resultado em JSON
+    return res.status(200).json(resultado);
+};
 
-        // Retorna status 200 (OK) com o resultado da análise
-        return Ok(resultado);
-    }
-}
+// Exporta a função
+module.exports = { analisar };
+```
+
+### 📄 app.js
+```
+// Importa o Express
+const express = require('express');
+
+// Cria a aplicação
+const app = express();
+
+// Permite receber JSON no body
+app.use(express.json());
+
+// Importa o controller
+const analiseController = require('./controllers/analiseController');
+
+// Define a rota POST /api/analise
+app.post('/api/analise', analiseController.analisar);
+
+// Define a porta
+const PORT = 3000;
+
+// Inicia o servidor
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+});
 ```
