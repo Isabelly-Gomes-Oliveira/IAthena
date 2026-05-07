@@ -1,23 +1,44 @@
 const DataRequestModel = require("../models/DataRequest");
-const textoService = require("../services/SearchService");
+const DataResponseModel = require("../models/DataResponse");
+
+const SearchService = require('../services/SearchService');
+const GenerateService = require('../services/GenerateService');
 
 class DataController {
 
-    enviarTexto(req, res) {
+    enviarTextoParaApp(req, res) {
 
         const { texto } = req.body;
 
-        // cria objeto model
-        const textoTesteUsuario = new DataRequestModel(texto);
+        // modelo de texto recebido do app
+        const textoApp = new DataRequestModel(texto);
 
         // envia para service
-        const resposta = textoService.processarTexto(textoTesteUsuario.texto);
+        let respostaCompleta;
+
+        const pesquisaObjeto = new SearchService; // objeto de pesquisa
+        pesquisaResultado = pesquisaObjeto.pesquisar(textoApp);// pesquisa sobre o texto
+
+        let resumoObjeto = new GenerateService; // objeto de resumo
+        let resumoTexto = "";
+
+
+
+        if (!pesquisaResultado) {
+            resumoTexto = "Não há resumo";
+            respostaCompleta = new DataResponseModel(resumoTexto, "não encontrado"); // modelo de resposta final
+        } else {
+            resumoTexto = resumoObjeto.resumir(pesquisa); // resume pesquisa e fontes
+            respostaCompleta = new DataResponseModel(resumoTexto, "encontrado"); // modelo de resposta final
+        }
 
         // devolve resposta
         res.status(200).json({
-            resposta: resposta
+            respostaCompleta
         });
     }
 }
 
 module.exports = new DataController();
+
+// ARRUMAR ESSE CONTROLLER
