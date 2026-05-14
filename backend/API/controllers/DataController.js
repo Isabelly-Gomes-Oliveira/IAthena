@@ -13,18 +13,20 @@ class DataController {
         // modelo de texto recebido do app
         const textoApp = new DataRequestModel(texto);
 
-        // envia para service
         let respostaCompleta;
+        let pesquisaResultado;
+
+        // envia para service
 
         const pesquisaObjeto = new SearchService; // objeto de pesquisa
         pesquisaResultado = pesquisaObjeto.pesquisar(textoApp);// pesquisa sobre o texto
 
         let resumoObjeto = new GenerateService; // objeto de resumo
-        let resumoTexto = "";
+        let resumoTexto;
 
 
 
-        if (!pesquisaResultado) {
+        if (pesquisaResultado.lenght === 0) {
             resumoTexto = "Não há resumo";
             respostaCompleta = new DataResponseModel(resumoTexto, "não encontrado"); // modelo de resposta final
         } else {
