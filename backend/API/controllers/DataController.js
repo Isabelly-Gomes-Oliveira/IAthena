@@ -1,8 +1,9 @@
 const DataRequestModel = require("../models/DataRequest");
 const DataResponseModel = require("../models/DataResponse");
 
-const SearchService = require('../services/SearchService');
-const GenerateService = require('../services/GenerateService');
+// são exportados desestruturados, então dec=vem ser importados desestruturados tbm
+const { SearchService } = require('../services/SearchService');
+const { GenerateService } = require('../services/GenerateService');
 
 class DataController {
 
@@ -19,18 +20,18 @@ class DataController {
         // envia para service
 
         const pesquisaObjeto = new SearchService; // objeto de pesquisa
-        pesquisaResultado = pesquisaObjeto.pesquisar(textoApp);// pesquisa sobre o texto
+        pesquisaResultado = pesquisaObjeto.pesquisar(textoApp.texto); // pesquisa sobre o texto
 
         let resumoObjeto = new GenerateService; // objeto de resumo
         let resumoTexto;
 
 
 
-        if (pesquisaResultado.lenght === 0) {
+        if (pesquisaResultado.length === 0) {
             resumoTexto = "Não há resumo";
             respostaCompleta = new DataResponseModel(resumoTexto, "não encontrado"); // modelo de resposta final
         } else {
-            resumoTexto = resumoObjeto.resumir(pesquisa); // resume pesquisa e fontes
+            resumoTexto = resumoObjeto.resumirPesquisa(pesquisaResultado); // resume pesquisa e fontes
             respostaCompleta = new DataResponseModel(resumoTexto, "encontrado"); // modelo de resposta final
         }
 

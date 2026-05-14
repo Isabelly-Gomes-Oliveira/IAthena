@@ -4,6 +4,6 @@ const textoController = require("../controllers/DataController");
 
 const router = express.Router();
 
-router.post("/teste", textoController.enviarTextoParaApp);
+router.post("/teste", (req, res) => textoController.enviarTextoParaApp(req, res));
 
 module.exports = router;
