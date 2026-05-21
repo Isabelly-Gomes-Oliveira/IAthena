@@ -242,13 +242,13 @@ fun SplashScreen(onTimeout: () -> Unit) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(34.dp))
 
             LinearProgressIndicator(
                 progress = { animatedProgress },
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
-                    .height(4.dp)
+                    .height(6.dp)
                     .clip(RoundedCornerShape(4.dp)),
                 color = Color(0xFFAB98F2),
                 trackColor = Color(0xFF332081)
