@@ -1,5 +1,4 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const dotenv = require('dotenv');
+import { GoogleGenAI } from '@google/genai';
 
 // Inicializa a SDK usando a sua variável de ambiente
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
