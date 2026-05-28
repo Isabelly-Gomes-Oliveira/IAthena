@@ -1,47 +1,40 @@
 const DataRequestModel = require("../models/DataRequest");
 const DataResponseModel = require("../models/DataResponse");
 
-// são exportados desestruturados, então dec=vem ser importados desestruturados tbm
+// são exportados desestruturados, então devem ser importados desestruturados tbm
 const { SearchService } = require('../services/SearchService');
 const { GenerateService } = require('../services/GenerateService');
 
 class DataController {
 
-    enviarTextoParaApp(req, res) {
+    async enviarTextoParaApp(req, res) {
+        try {
+            const { texto } = req.body;
 
-        const { texto } = req.body;
+            const textoApp = new DataRequestModel(texto);
 
-        // modelo de texto recebido do app
-        const textoApp = new DataRequestModel(texto);
+            const pesquisaObjeto = new SearchService();
+            const pesquisaResultado = pesquisaObjeto.pesquisar(textoApp.texto);
 
-        let respostaCompleta;
-        let pesquisaResultado;
+            const resumoObjeto = new GenerateService();
+            let resumoTexto;
+            let respostaCompleta;
 
-        // envia para service
+            if (pesquisaResultado.length === 0) {
+                resumoTexto = "Não há resumo";
+                respostaCompleta = new DataResponseModel(resumoTexto, "não encontrado");
+            } else {
+                resumoTexto = await resumoObjeto.resumirPesquisa(pesquisaResultado);
+                respostaCompleta = new DataResponseModel(resumoTexto, "encontrado");
+            }
 
-        const pesquisaObjeto = new SearchService; // objeto de pesquisa
-        pesquisaResultado = pesquisaObjeto.pesquisar(textoApp.texto); // pesquisa sobre o texto
+            res.status(200).json({ respostaCompleta });
 
-        let resumoObjeto = new GenerateService; // objeto de resumo
-        let resumoTexto;
-
-
-
-        if (pesquisaResultado.length === 0) {
-            resumoTexto = "Não há resumo";
-            respostaCompleta = new DataResponseModel(resumoTexto, "não encontrado"); // modelo de resposta final
-        } else {
-            resumoTexto = resumoObjeto.resumirPesquisa(pesquisaResultado); // resume pesquisa e fontes
-            respostaCompleta = new DataResponseModel(resumoTexto, "encontrado"); // modelo de resposta final
+        } catch (error) {
+            console.error("Erro no controller:", error);
+            res.status(500).json({ erro: "Erro interno no servidor" });
         }
-
-        // devolve resposta
-        res.status(200).json({
-            respostaCompleta
-        });
     }
 }
 
 module.exports = new DataController();
-
-// ARRUMAR ESSE CONTROLLER
