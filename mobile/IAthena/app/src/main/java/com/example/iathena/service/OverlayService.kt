@@ -1,10 +1,12 @@
-package com.example.iathena
+package com.example.iathena.service
 
 import android.app.Service
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.drawable.GradientDrawable
 import android.os.IBinder
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
@@ -71,9 +73,9 @@ class OverlayService : Service() {
 
             isSingleLine = false
             maxHeight = maxHeightPx
-            movementMethod = android.text.method.ScrollingMovementMethod()
+            movementMethod = ScrollingMovementMethod()
 
-            background = android.graphics.drawable.GradientDrawable().apply {
+            background = GradientDrawable().apply {
                 setColor(Color.parseColor("#CC000000"))
                 cornerRadius = 16f
             }
@@ -87,8 +89,8 @@ class OverlayService : Service() {
             text = "🔎"
             textSize = 24f
 
-            val roundBackground = android.graphics.drawable.GradientDrawable().apply {
-                shape = android.graphics.drawable.GradientDrawable.OVAL
+            val roundBackground = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
                 setColor(Color.parseColor("#6200EE"))
             }
             background = roundBackground
