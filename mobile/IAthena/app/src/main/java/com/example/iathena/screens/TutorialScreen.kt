@@ -1,25 +1,17 @@
 package com.example.iathena.screens
 
-import android.media.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,6 +24,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import com.example.iathena.R
+import com.example.iathena.components.IathenaButton
 
 @Composable
 fun TutorialScreen(onComecar: () -> Unit) {
@@ -67,22 +60,26 @@ fun TutorialScreen(onComecar: () -> Unit) {
             when (page) {
                 0 -> ResumoGeralPage()
                 1 -> DetalheTopicoPage(
-                    img = R.drawable.img2,
+                    img = R.drawable.img1_nobg,
+                    size = 150,
                     titulo = "Ative o ícone flutuante",
                     descricao = "Ative o ícone flutuante nas configurações para que ele fique sempre sobre as telas do seu celular."
                 )
                 2 -> DetalheTopicoPage(
-                    img = R.drawable.img3,
+                    img = R.drawable.img2_nobg,
+                    size = 150,
                     titulo = "Escaneie qualquer texto",
                     descricao = "Toque no ícone flutuante e escolha 'Escanear tela'. A Inteligência Artificial irá ler e analisar o conteúdo instantaneamente."
                 )
                 3 -> DetalheTopicoPage(
-                    img = R.drawable.img4,
+                    img = R.drawable.img3_nobg,
+                    size = 180,
                     titulo = "Ganhe XP e moedas",
                     descricao = "Você não está só checando fatos, está jogando! Cada verificação correta, missão concluída ou quiz te dá XP e moedas."
                 )
                 4 -> DetalheTopicoPage(
-                    img = R.drawable.img5,
+                    img = R.drawable.img4_nobg,
+                    size = 180,
                     titulo = "Identifique fake news",
                     descricao = "A IA mostra se o conteúdo é confiável ou suspeito, explicando o porquê de forma simples e direta.",
                     mostrarBotaoFinal = true,
@@ -139,25 +136,25 @@ fun ResumoGeralPage() {
                 numero = "1",
                 titulo = "Ative o ícone flutuante",
                 descricao = "Ative o ícone flutuante nas configurações para que ele fique sempre sobre as telas.",
-                img = R.drawable.img2
+                img = R.drawable.img1_nobg
             )
             TutorialCard(
                 numero = "2",
                 titulo = "Escaneie qualquer texto",
                 descricao = "Toque no ícone e escolha 'Escanear tela'. A IA irá ler e analisar o conteúdo.",
-                img = R.drawable.img3
+                img = R.drawable.img2
             )
             TutorialCard(
                 numero = "3",
                 titulo = "Ganhe XP e moedas",
                 descricao = "Cada verificação correta, missão concluída ou quiz te dá XP e moedas!",
-                img = R.drawable.img4
+                img = R.drawable.img3
             )
             TutorialCard(
                 numero = "4",
                 titulo = "Identifique fake news",
                 descricao = "A IA mostra se o conteúdo é confiável ou suspeito e explica o porquê.",
-                img = R.drawable.img5
+                img = R.drawable.img4
             )
             Spacer(modifier = Modifier.height(20.dp))
         }
@@ -167,6 +164,7 @@ fun ResumoGeralPage() {
 @Composable
 fun DetalheTopicoPage(
     img: Int,
+    size: Int = 90,
     titulo: String,
     descricao: String,
     mostrarBotaoFinal: Boolean = false,
@@ -188,7 +186,7 @@ fun DetalheTopicoPage(
             Image(
                 painter = painterResource(id = img),
                 contentDescription = null,
-                modifier = Modifier.size(90.dp)
+                modifier = Modifier.size(size.dp)
             )
         }
         Spacer(modifier = Modifier.height(40.dp))
@@ -211,16 +209,7 @@ fun DetalheTopicoPage(
             Spacer(modifier = Modifier.height(40.dp))
             MessageCard()
             Spacer(modifier = Modifier.height(30.dp))
-            Button(
-                onClick = onComecar,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp),
-                shape = RoundedCornerShape(18.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6A4CF4))
-            ) {
-                Text("Vamos começar!", fontSize = 22.sp, color = Color.White)
-            }
+            IathenaButton(onComecar,"Vamos começar!")
         }
     }
 }

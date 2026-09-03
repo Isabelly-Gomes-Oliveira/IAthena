@@ -1,6 +1,7 @@
 package com.example.iathena.screens
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,12 +19,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.iathena.R
+import com.example.iathena.components.LevelCard
 
 // Cores do App baseadas na imagem
 val PurplePrimary = Color(0xFF6A4CF4)
@@ -51,7 +55,13 @@ fun HomeScreen(onActivateOverlay: () -> Unit) { // <-- Parâmetro adicionado aqu
         ) {
             item { Spacer(modifier = Modifier.height(10.dp)) }
             item { HomeHeader() }
-            item { LevelCard() }
+            item { LevelCard(
+                nivel = 12,
+                titulo = "Guardião da Informação",
+                xpAtual = 1250,
+                xpMaximo = 2000,
+                moedas = 2450
+            ) }
             item { ScannerCard(onActivateOverlay = onActivateOverlay) } // <-- Parâmetro repassado aqui
             item {
                 Row(
@@ -113,89 +123,7 @@ fun HomeHeader() {
     }
 }
 
-@Composable
-fun LevelCard() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = PurpleDark)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Hexágono do Nível
-            Box(
-                modifier = Modifier.size(70.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Canvas(modifier = Modifier.matchParentSize()) {
-                    val path = Path().apply {
-                        val width = size.width
-                        val height = size.height
-                        moveTo(width / 2f, 0f)
-                        lineTo(width, height * 0.25f)
-                        lineTo(width, height * 0.75f)
-                        lineTo(width / 2f, height)
-                        lineTo(0f, height * 0.75f)
-                        lineTo(0f, height * 0.25f)
-                        close()
-                    }
-                    drawPath(path, color = Color(0xFF7A61F5))
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("NÍVEL", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Text("12", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
-                }
-            }
-            Spacer(modifier = Modifier.width(16.dp))
 
-            // Informações de XP
-            Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Guardião da Informação", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(Icons.Default.Info, contentDescription = "Info", tint = Color.White.copy(alpha = 0.5f), modifier = Modifier.size(14.dp))
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                LinearProgressIndicator(
-                    progress = 0.625f,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .clip(RoundedCornerShape(10.dp)),
-                    color = GreenSuccess,
-                    trackColor = Color(0xFF4A2CBA)
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Row {
-                    Text("1.250 / 2.000 ", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    Text("XP", color = GreenSuccess, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
-                }
-            }
-
-            // Divisor e Moedas
-            Divider(
-                color = Color.White.copy(alpha = 0.2f),
-                modifier = Modifier
-                    .height(50.dp)
-                    .width(1.dp)
-                    .padding(horizontal = 12.dp)
-            )
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Star, contentDescription = "Moeda", tint = YellowCoin, modifier = Modifier.size(20.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("2.450", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
-                }
-                Text("Moedas", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
-            }
-        }
-    }
-}
 
 @Composable
 fun ScannerCard(onActivateOverlay: () -> Unit) { // <-- Parâmetro recebido aqui
@@ -244,11 +172,16 @@ fun ScannerCard(onActivateOverlay: () -> Unit) { // <-- Parâmetro recebido aqui
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 20.dp, end = 10.dp)
-                    .size(120.dp)
-                    .background(Color.Transparent)
+                    .padding(top = 40.dp, end = 25.dp)
+                    .size(150.dp)
+                    .background(Color.Transparent),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Face, contentDescription = "Coruja Placeholder", tint = PurplePrimary.copy(alpha = 0.2f), modifier = Modifier.fillMaxSize())
+                Image(
+                    painter = painterResource(id = R.drawable.img_owl),
+                    contentDescription = "Owl with magnifying glass",
+                    modifier = Modifier.size(130.dp)
+                )
             }
         }
     }
