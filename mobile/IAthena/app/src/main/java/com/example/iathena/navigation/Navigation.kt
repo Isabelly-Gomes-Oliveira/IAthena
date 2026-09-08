@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.iathena.screens.HomeScreen
+import com.example.iathena.screens.ProfileScreen
 import com.example.iathena.screens.SplashScreen
 import com.example.iathena.screens.TutorialScreen
 import com.example.iathena.service.OverlayService
@@ -58,8 +59,15 @@ fun AppNavigation() {
                         context.startService(serviceIntent)
                         Log.d("IATHENA", "Serviço Overlay Iniciado com sucesso!")
                     }
+                },
+                onNavigateToProfile = {
+                    // 2. Comando que diz para ir para a tela de perfil quando clicado
+                    navController.navigate("profile")
                 }
             )
+        }
+        composable("profile") {
+            ProfileScreen()
         }
     }
 }

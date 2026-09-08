@@ -41,7 +41,8 @@ val TextDark = Color(0xFF1C1C1C)
 val TextGray = Color(0xFF8E8E93)
 
 @Composable
-fun HomeScreen(onActivateOverlay: () -> Unit) { // <-- Parâmetro adicionado aqui
+fun HomeScreen(onActivateOverlay: () -> Unit,
+               onNavigateToProfile: () -> Unit) {
     Scaffold(
         bottomBar = { HomeBottomNavigation() },
         containerColor = BackgroundGray
@@ -54,13 +55,14 @@ fun HomeScreen(onActivateOverlay: () -> Unit) { // <-- Parâmetro adicionado aqu
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item { Spacer(modifier = Modifier.height(10.dp)) }
-            item { HomeHeader() }
+            item { HomeHeader(onNavigateToProfile = onNavigateToProfile) }
             item { LevelCard(
                 nivel = 12,
                 titulo = "Guardião da Informação",
                 xpAtual = 1250,
                 xpMaximo = 2000,
-                moedas = 2450
+                moedas = 2450,
+                modifier = Modifier.clickable { onNavigateToProfile() }
             ) }
             item { ScannerCard(onActivateOverlay = onActivateOverlay) } // <-- Parâmetro repassado aqui
             item {
@@ -79,13 +81,17 @@ fun HomeScreen(onActivateOverlay: () -> Unit) { // <-- Parâmetro adicionado aqu
 }
 
 @Composable
-fun HomeHeader() {
+fun HomeHeader(onNavigateToProfile: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .clickable { onNavigateToProfile() } // Clicou aqui, vai pro perfil!
+        ) {
             // Imagem de Perfil (Coruja)
             Box(
                 modifier = Modifier
@@ -186,7 +192,6 @@ fun ScannerCard(onActivateOverlay: () -> Unit) { // <-- Parâmetro recebido aqui
         }
     }
 }
-
 @Composable
 fun ChallengesCard() {
     Card(
@@ -194,7 +199,6 @@ fun ChallengesCard() {
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        // Reduzimos o padding geral de 16.dp para 12.dp para ganhar espaço
         Column(modifier = Modifier.padding(12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -204,27 +208,27 @@ fun ChallengesCard() {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.CheckCircle, contentDescription = "Alvo", tint = PurplePrimary, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Desafios do dia", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextDark)
+                    Text("Desafios do dia", fontWeight = FontWeight.Bold, fontSize = 13.sp, lineHeight = 14.sp, color = TextDark)
                 }
                 Text("Ver todos", color = PurplePrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
             }
-            Spacer(modifier = Modifier.height(10.dp)) // Reduzido de 16.dp
+            Spacer(modifier = Modifier.height(10.dp))
 
-            ChallengeItem(Icons.Default.Search, "Verifique 3 notícias", "Verifique 3 conteúdos hoje", "1 / 3", 0.33f, "+50")
-            Divider(color = BackgroundGray, modifier = Modifier.padding(vertical = 4.dp)) // Reduzido de 8.dp
-            ChallengeItem(Icons.Default.Check, "Faça o quiz diário", "Responda 5 perguntas", "0 / 5", 0f, "+40", iconColor = GreenSuccess)
-            Divider(color = BackgroundGray, modifier = Modifier.padding(vertical = 4.dp)) // Reduzido de 8.dp
-            ChallengeItem(Icons.Default.Share, "Compartilhe com amigos", "Convide 1 amigo para o app", "0 / 1", 0f, "+30", iconColor = Color(0xFFFFA000))
+            ChallengeItem(Icons.Default.Search, "Verifique 3 notícias", "1 / 3", 0.33f, "+50")
+            HorizontalDivider(color = BackgroundGray, modifier = Modifier.padding(vertical = 4.dp))
+            ChallengeItem(Icons.Default.Check, "Faça o quiz diário", "0 / 5", 0f, "+40", iconColor = GreenSuccess)
+            HorizontalDivider(color = BackgroundGray, modifier = Modifier.padding(vertical = 4.dp))
+            ChallengeItem(Icons.Default.Share, "Compartilhe com amigos", "0 / 1", 0f, "+30", iconColor = Color(0xFFFFA000))
         }
     }
 }
 
 @Composable
-fun ChallengeItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, subtitle: String, progressText: String, progress: Float, xp: String, iconColor: Color = PurplePrimary) {
+fun ChallengeItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, progressText: String, progress: Float, xp: String, iconColor: Color = PurplePrimary) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
-                .size(36.dp) // Ícone ligeiramente menor (era 36.dp)
+                .size(36.dp)
                 .background(iconColor.copy(alpha = 0.1f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -232,21 +236,29 @@ fun ChallengeItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: 
         }
         Spacer(modifier = Modifier.width(8.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
-            Text(subtitle, fontSize = 9.sp, color = TextGray)
-            Spacer(modifier = Modifier.height(2.dp)) // Reduzido de 4.dp
+            Text(title, fontWeight = FontWeight.Bold, fontSize = 11.sp, lineHeight = 12.sp, color = TextDark)
+            Spacer(modifier = Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(progressText, fontSize = 9.sp, color = TextDark, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.width(6.dp))
-                LinearProgressIndicator(
-                    progress = progress,
+
+                // BARRA DE PROGRESSO CUSTOMIZADA (Sem bolinha/falha)
+                Box(
                     modifier = Modifier
                         .height(4.dp)
                         .weight(1f)
-                        .clip(RoundedCornerShape(2.dp)),
-                    color = GreenSuccess,
-                    trackColor = BackgroundGray
-                )
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(BackgroundGray)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(fraction = progress)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(2.dp))
+                            .background(GreenSuccess)
+                    )
+                }
+
             }
         }
         Spacer(modifier = Modifier.width(6.dp))
@@ -255,9 +267,9 @@ fun ChallengeItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: 
             Box(
                 modifier = Modifier
                     .background(PurplePrimary, RoundedCornerShape(4.dp))
-                    .padding(horizontal = 4.dp, vertical = 2.dp)
+                    .padding(horizontal = 6.dp, vertical = 1.dp)
             ) {
-                Text("XP", color = Color.White, fontSize = 7.sp, fontWeight = FontWeight.Bold)
+                Text("XP", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -307,34 +319,50 @@ fun StreakCard() {
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
+
+            // CARD ROXO (Meta Semanal)
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(containerColor = PurpleDark)
             ) {
                 Row(
-                    modifier = Modifier.padding(12.dp),
+                    // Reduzi o padding vertical de 12.dp para 8.dp
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Star, contentDescription = "Estrela", tint = YellowCoin, modifier = Modifier.size(12.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Meta semanal", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Text("Meta semanal", color = Color.White, fontSize = 10.sp, lineHeight = 11.sp, fontWeight = FontWeight.Bold)
                         }
+
                         Spacer(modifier = Modifier.height(2.dp))
-                        Text("Verifique 10 conteúdos", color = Color.White.copy(alpha = 0.8f), fontSize = 8.sp)
-                        Spacer(modifier = Modifier.height(6.dp))
-                        LinearProgressIndicator(
-                            progress = 0.6f,
+                        Text("Verifique 10 conteúdos", color = Color.White.copy(alpha = 0.8f), fontSize = 8.sp, lineHeight = 9.sp)
+
+                        // Reduzi de 6.dp para 4.dp para ficar mais coladinho
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        // BARRA DE PROGRESSO CUSTOMIZADA (Sem bolinha/falha)
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(4.dp)
-                                .clip(RoundedCornerShape(2.dp)),
-                            color = GreenSuccess,
-                            trackColor = Color(0xFF4A2CBA)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(Color(0xFF4A2CBA))
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(fraction = 0.6f)
+                                    .fillMaxHeight()
+                                    .clip(RoundedCornerShape(2.dp))
+                                    .background(GreenSuccess)
+                            )
+                        }
+
+                        // Reduzi de 4.dp para 2.dp
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text("6 / 10", color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.Bold)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
@@ -344,7 +372,6 @@ fun StreakCard() {
         }
     }
 }
-
 @Composable
 fun RecentVerifications() {
     Column(modifier = Modifier.fillMaxWidth()) {
