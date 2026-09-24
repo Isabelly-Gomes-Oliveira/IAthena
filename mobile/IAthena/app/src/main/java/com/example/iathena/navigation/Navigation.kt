@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.iathena.screens.ConfiguracoesScreen
 import com.example.iathena.screens.HistoricoScreen
 import com.example.iathena.screens.HomeScreen
 import com.example.iathena.screens.MissoesScreen
@@ -83,6 +84,11 @@ fun AppNavigation() {
             HistoricoScreen(
                 onNavigate = { route -> navController.navigate(route) },
                 onNavigateToResult = { id -> navController.navigate("resultado/$id") } // Passa o ID na rota
+            )
+        }
+        composable("configuracoes") {
+            ConfiguracoesScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
         composable(

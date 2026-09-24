@@ -57,7 +57,7 @@ fun HomeScreen(onActivateOverlay: () -> Unit,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item { Spacer(modifier = Modifier.height(10.dp)) }
-            item { HomeHeader(onNavigate = { onNavigate("profile") }) }
+            item { HomeHeader(onNavigateToProfile = { onNavigate("profile") }, onNavigateToSettings = { onNavigate("configuracoes") }) }
             item { LevelCard(
                 nivel = 12,
                 titulo = "Guardião da Informação",
@@ -83,7 +83,7 @@ fun HomeScreen(onActivateOverlay: () -> Unit,
 }
 
 @Composable
-fun HomeHeader(onNavigate: () -> Unit) {
+fun HomeHeader(onNavigateToProfile: () -> Unit, onNavigateToSettings: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -91,10 +91,8 @@ fun HomeHeader(onNavigate: () -> Unit) {
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .clickable { onNavigate() } // Clicou aqui, vai pro perfil!
+            modifier = Modifier.clickable { onNavigateToProfile() }
         ) {
-            // Imagem de Perfil (Coruja)
             Box(
                 modifier = Modifier
                     .size(50.dp)
@@ -119,14 +117,15 @@ fun HomeHeader(onNavigate: () -> Unit) {
                 )
             }
         }
-        // Ícone de Notificação
+        // Ícone de Configurações
         Box(
             modifier = Modifier
                 .size(45.dp)
-                .background(Color.White, RoundedCornerShape(12.dp)),
+                .background(Color.White, RoundedCornerShape(12.dp))
+                .clickable { onNavigateToSettings() },
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Outlined.Notifications, contentDescription = "Notificações", tint = PurplePrimary)
+            Icon(Icons.Default.Settings, contentDescription = "Configurações", tint = PurplePrimary)
         }
     }
 }
