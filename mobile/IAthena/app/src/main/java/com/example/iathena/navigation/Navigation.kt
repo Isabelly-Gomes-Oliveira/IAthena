@@ -6,11 +6,17 @@ import android.provider.Settings
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.iathena.screens.HistoricoScreen
 import com.example.iathena.screens.HomeScreen
+import com.example.iathena.screens.MissoesScreen
 import com.example.iathena.screens.ProfileScreen
+import com.example.iathena.screens.RecompensasScreen
+import com.example.iathena.screens.ResultadoScreen
 import com.example.iathena.screens.SplashScreen
 import com.example.iathena.screens.TutorialScreen
 import com.example.iathena.service.OverlayService
@@ -60,14 +66,36 @@ fun AppNavigation() {
                         Log.d("IATHENA", "Serviço Overlay Iniciado com sucesso!")
                     }
                 },
-                onNavigateToProfile = {
-                    // 2. Comando que diz para ir para a tela de perfil quando clicado
-                    navController.navigate("profile")
-                }
+                onNavigate = { route -> navController.navigate(route) }
             )
         }
+        composable("missoes") {
+            MissoesScreen(onNavigate = { route -> navController.navigate(route) })
+        }
+        composable("recompensas") {
+            RecompensasScreen(onNavigate = { route -> navController.navigate(route) })
+        }
+
         composable("profile") {
-            ProfileScreen()
+            ProfileScreen(onNavigate = { route -> navController.navigate(route) })
+        }
+        composable("historico") {
+            HistoricoScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                onNavigateToResult = { id -> navController.navigate("resultado/$id") } // Passa o ID na rota
+            )
+        }
+        composable(
+            route = "resultado/{id}", // Define que essa rota espera um parâmetro {id}
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { backStackEntry ->
+            // Extrai o ID da rota
+            val analiseId = backStackEntry.arguments?.getString("id") ?: "1"
+
+            ResultadoScreen(
+                analiseId = analiseId,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }

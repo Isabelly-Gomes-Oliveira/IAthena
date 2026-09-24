@@ -23,11 +23,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.iathena.R
+import com.example.iathena.components.AppBottomNavigation
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(onNavigate: (String) -> Unit) {
     Scaffold(
-        bottomBar = { ProfileBottomNavigation() },
+        bottomBar = { AppBottomNavigation(currentRoute = "missoes", onNavigate = onNavigate) },
         containerColor = BackgroundGray
     ) { paddingValues ->
         LazyColumn(

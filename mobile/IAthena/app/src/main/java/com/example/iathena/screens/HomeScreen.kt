@@ -1,5 +1,6 @@
 package com.example.iathena.screens
 
+import ChallengeItem
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.iathena.R
+import com.example.iathena.components.AppBottomNavigation
 import com.example.iathena.components.LevelCard
 
 // Cores do App baseadas na imagem
@@ -42,9 +44,9 @@ val TextGray = Color(0xFF8E8E93)
 
 @Composable
 fun HomeScreen(onActivateOverlay: () -> Unit,
-               onNavigateToProfile: () -> Unit) {
+               onNavigate: (String) -> Unit) {
     Scaffold(
-        bottomBar = { HomeBottomNavigation() },
+        bottomBar = { AppBottomNavigation(currentRoute = "home", onNavigate = onNavigate) },
         containerColor = BackgroundGray
     ) { paddingValues ->
         LazyColumn(
@@ -55,14 +57,14 @@ fun HomeScreen(onActivateOverlay: () -> Unit,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item { Spacer(modifier = Modifier.height(10.dp)) }
-            item { HomeHeader(onNavigateToProfile = onNavigateToProfile) }
+            item { HomeHeader(onNavigate = { onNavigate("profile") }) }
             item { LevelCard(
                 nivel = 12,
                 titulo = "Guardião da Informação",
                 xpAtual = 1250,
                 xpMaximo = 2000,
                 moedas = 2450,
-                modifier = Modifier.clickable { onNavigateToProfile() }
+                modifier = Modifier.clickable { onNavigate("profile") }
             ) }
             item { ScannerCard(onActivateOverlay = onActivateOverlay) } // <-- Parâmetro repassado aqui
             item {
@@ -74,14 +76,14 @@ fun HomeScreen(onActivateOverlay: () -> Unit,
                     Box(modifier = Modifier.weight(1f)) { StreakCard() }
                 }
             }
-            item { RecentVerifications() }
+            item { RecentVerifications(onNavigate = onNavigate) }
             item { Spacer(modifier = Modifier.height(20.dp)) }
         }
     }
 }
 
 @Composable
-fun HomeHeader(onNavigateToProfile: () -> Unit) {
+fun HomeHeader(onNavigate: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -90,7 +92,7 @@ fun HomeHeader(onNavigateToProfile: () -> Unit) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .clickable { onNavigateToProfile() } // Clicou aqui, vai pro perfil!
+                .clickable { onNavigate() } // Clicou aqui, vai pro perfil!
         ) {
             // Imagem de Perfil (Coruja)
             Box(
@@ -223,57 +225,6 @@ fun ChallengesCard() {
     }
 }
 
-@Composable
-fun ChallengeItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, progressText: String, progress: Float, xp: String, iconColor: Color = PurplePrimary) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .background(iconColor.copy(alpha = 0.1f), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(icon, contentDescription = null, tint = iconColor, modifier = Modifier.size(16.dp))
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(title, fontWeight = FontWeight.Bold, fontSize = 11.sp, lineHeight = 12.sp, color = TextDark)
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(progressText, fontSize = 9.sp, color = TextDark, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.width(6.dp))
-
-                // BARRA DE PROGRESSO CUSTOMIZADA (Sem bolinha/falha)
-                Box(
-                    modifier = Modifier
-                        .height(4.dp)
-                        .weight(1f)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(BackgroundGray)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(fraction = progress)
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(2.dp))
-                            .background(GreenSuccess)
-                    )
-                }
-
-            }
-        }
-        Spacer(modifier = Modifier.width(6.dp))
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(xp, color = Color(0xFFFFA000), fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-            Box(
-                modifier = Modifier
-                    .background(PurplePrimary, RoundedCornerShape(4.dp))
-                    .padding(horizontal = 6.dp, vertical = 1.dp)
-            ) {
-                Text("XP", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
-            }
-        }
-    }
-}
 
 @Composable
 fun StreakCard() {
@@ -373,7 +324,7 @@ fun StreakCard() {
     }
 }
 @Composable
-fun RecentVerifications() {
+fun RecentVerifications(onNavigate: (String) -> Unit) { // <-- Adicionado parâmetro aqui
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -381,24 +332,43 @@ fun RecentVerifications() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Verificações recentes", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
-            Text("Ver histórico", color = PurplePrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.clickable { /* Navegar Histórico */ })
+            Text(
+                "Ver histórico",
+                color = PurplePrimary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable { onNavigate("historico") }
+            )
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        HistoryCard(title = "“Chuvas fortes vão acabar com o verão esse ano”", status = "Confiável", time = "2h", percentage = "92%", isSafe = true)
+        // Linkamos os IDs dos dados falsos (2, 1 e 3) criados na etapa anterior
+        HistoryCard(
+            title = "“Chuvas fortes vão acabar com o verão esse ano”",
+            status = "Confiável", time = "2h", percentage = "92%", isSafe = true,
+            onClick = { onNavigate("resultado/2") } // <-- Adicionado clique
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        HistoryCard(title = "“Novo golpe do WhatsApp rouba dados pelo link”", status = "Suspeito", time = "5h", percentage = "23%", isSafe = false)
+        HistoryCard(
+            title = "“Novo golpe do WhatsApp rouba dados pelo link”",
+            status = "Suspeito", time = "5h", percentage = "23%", isSafe = false,
+            onClick = { onNavigate("resultado/1") } // <-- Adicionado clique
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        HistoryCard(title = "“Laranja com bicarbonato cura doenças”", status = "Suspeito", time = "1d", percentage = "18%", isSafe = false)
+        HistoryCard(
+            title = "“Laranja com bicarbonato cura doenças”",
+            status = "Suspeito", time = "1d", percentage = "18%", isSafe = false,
+            onClick = { onNavigate("resultado/3") } // <-- Adicionado clique
+        )
     }
 }
 
 @Composable
-fun HistoryCard(title: String, status: String, time: String, percentage: String, isSafe: Boolean) {
+fun HistoryCard(title: String, status: String, time: String, percentage: String, isSafe: Boolean, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* Navegar para Detalhes */ },
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
@@ -450,17 +420,3 @@ fun HistoryCard(title: String, status: String, time: String, percentage: String,
     }
 }
 
-@Composable
-fun HomeBottomNavigation() {
-    NavigationBar(
-        containerColor = Color.White,
-        contentColor = TextGray,
-        tonalElevation = 8.dp
-    ) {
-        NavigationBarItem(icon = { Icon(Icons.Default.Home, contentDescription = "Início") }, label = { Text("Início") }, selected = true, onClick = { }, colors = NavigationBarItemDefaults.colors(selectedIconColor = PurplePrimary, selectedTextColor = PurplePrimary, indicatorColor = PurpleLight))
-        NavigationBarItem(icon = { Icon(Icons.Default.Build, contentDescription = "Missões") }, label = { Text("Missões") }, selected = false, onClick = { })
-        NavigationBarItem(icon = { Icon(Icons.Default.Search, contentDescription = "Quiz") }, label = { Text("Quiz") }, selected = false, onClick = { })
-        NavigationBarItem(icon = { Icon(Icons.Default.Star, contentDescription = "Recompensas") }, label = { Text("Recompensas") }, selected = false, onClick = { })
-        NavigationBarItem(icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") }, label = { Text("Perfil") }, selected = false, onClick = { })
-    }
-}
