@@ -15,6 +15,7 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.example.iathena.screens.CaptureActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,6 +25,12 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.pm.ServiceInfo
+import android.os.Build
+import androidx.core.app.NotificationCompat
 
 class OverlayService : Service() {
 
@@ -37,6 +44,31 @@ class OverlayService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+
+        val channelId = "iathena_overlay_channel"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "IAthena Scanner",
+                NotificationManager.IMPORTANCE_LOW
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+
+        // Usamos NotificationCompat.Builder para evitar o erro da API 26!
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setContentTitle("IAthena")
+            .setContentText("Scanner flutuante ativado")
+            .setSmallIcon(android.R.drawable.ic_menu_search)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
+        } else {
+            startForeground(1, notification)
+        }
 
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
@@ -98,19 +130,12 @@ class OverlayService : Service() {
             var isCapturing = false
 
             setOnClickListener {
-                isCapturing = !isCapturing
-
-                if (isCapturing) {
-                    text = "⏳"
-                    roundBackground.setColor(Color.parseColor("#03DAC5"))
-                    resultTextView.visibility = View.VISIBLE
-                    resultTextView.text = "Pensando..."
-                    enviarMensagemParaApi()
-                } else {
-                    text = "🔎"
-                    roundBackground.setColor(Color.parseColor("#6200EE"))
-                    resultTextView.visibility = View.GONE
+                // AQUI: Usamos this@OverlayService para referenciar o Serviço e não o Botão
+                val intent = Intent(this@OverlayService, CaptureActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 }
+                startActivity(intent)
             }
 
             setOnLongClickListener {
